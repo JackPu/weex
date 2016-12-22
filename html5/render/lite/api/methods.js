@@ -1,9 +1,10 @@
 /**
  * @fileOverview The api for invoking with "$" prefix
  */
-import config from '../config'
+// import config from '../config'
+import { requireModule } from '../static/register'
 
-const { nativeComponentMap } = config
+// const { nativeComponentMap } = config
 
 /**
  * ==========================================================
@@ -26,24 +27,24 @@ export function $ (id) {
   }
 }
 
-function addComponentMethods (app, el) {
-  if (el && el.type) {
-    const component = nativeComponentMap[el.type]
-    if (component && component.methods) {
-      component.methods.forEach((method) => {
-        el[method] = (...args) => {
-          app.callTasks({
-            component: component.type,
-            ref: el.ref,
-            method: method,
-            args: args
-          })
-        }
-      })
-    }
-  }
-  return el
-}
+// function addComponentMethods (app, el) {
+//   if (el && el.type) {
+//     const component = nativeComponentMap[el.type]
+//     if (component && component.methods) {
+//       component.methods.forEach((method) => {
+//         el[method] = (...args) => {
+//           app.callTasks({
+//             component: component.type,
+//             ref: el.ref,
+//             method: method,
+//             args: args
+//           })
+//         }
+//       })
+//     }
+//   }
+//   return el
+// }
 
 /**
  * find the element by id
@@ -52,10 +53,11 @@ function addComponentMethods (app, el) {
  * @return {Element}
  */
 export function $el (id) {
-  const info = this._ids[id]
-  if (info) {
-    return addComponentMethods(info.vm._app || {}, info.el)
-  }
+  // const info = this._ids[id]
+  // if (info) {
+  //   return addComponentMethods(info.vm._app || {}, info.el)
+  // }
+  return (this._ids[id] || {}).el
 }
 
 /**
@@ -96,8 +98,9 @@ export function $scrollTo (id, offset) {
           '.scrollTo(el, options)" instead')
   const el = this.$el(id)
   if (el) {
-    const dom = this._app.requireModule('dom')
-    dom.scrollToElement(el.ref, { offset: offset })
+    const dom = requireModule('dom')
+    dom.scrollToElement(el, { offset: offset })
+    // dom.scrollToElement(el.ref, { offset: offset })
   }
 }
 
@@ -114,8 +117,8 @@ export function $scrollTo (id, offset) {
 export function $transition (id, options, callback) {
   const el = this.$el(id)
   if (el && options && options.styles) {
-    const animation = this._app.requireModule('animation')
-    animation.transition(el.ref, options, (...args) => {
+    const animation = requireModule('animation')
+    animation.transition(el, options, (...args) => {
       this._setStyle(el, options.styles)
       callback && callback(...args)
     })
@@ -157,7 +160,7 @@ export function $sendHttp (params, callback) {
   console.warn('[JS Framework] Vm#$sendHttp is deprecated, ' +
           'please use "require(\'@weex-module/stream\')' +
           '.sendHttp(params, callback)" instead')
-  const stream = this._app.requireModule('stream')
+  const stream = requireModule('stream')
   stream.sendHttp(params, callback)
 }
 
@@ -170,7 +173,7 @@ export function $openURL (url) {
   console.warn('[JS Framework] Vm#$openURL is deprecated, ' +
           'please use "require(\'@weex-module/event\')' +
           '.openURL(url)" instead')
-  const event = this._app.requireModule('event')
+  const event = requireModule('event')
   event.openURL(url)
 }
 
@@ -183,7 +186,7 @@ export function $setTitle (title) {
   console.warn('[JS Framework] Vm#$setTitle is deprecated, ' +
           'please use "require(\'@weex-module/pageInfo\')' +
           '.setTitle(title)" instead')
-  const pageInfo = this._app.requireModule('pageInfo')
+  const pageInfo = requireModule('pageInfo')
   pageInfo.setTitle(title)
 }
 
@@ -197,7 +200,7 @@ export function $setTitle (title) {
 export function $call (moduleName, methodName, ...args) {
   console.warn('[JS Framework] Vm#$call is deprecated, ' +
     'please use "require(\'@weex-module/moduleName\')" instead')
-  const module = this._app.requireModule(moduleName)
+  const module = requireModule(moduleName)
   if (module && module[methodName]) {
     module[methodName](...args)
   }

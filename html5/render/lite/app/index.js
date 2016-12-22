@@ -3,12 +3,9 @@
  * Weex instance constructor & definition
  */
 
-// import { extend } from '../utils'
 // import {
-//   registerComponent,
-//   registerModule,
 //   requireModule
-// } from './register'
+// } from '../static/register'
 // import { updateActions, callTasks } from './ctrl/index'
 
 import App from './instance'
