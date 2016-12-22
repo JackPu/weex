@@ -1,6 +1,6 @@
 {
   "name": "weex-html5",
-  "version": "0.3.2",
+  "version": "0.5.0",
   "description": "Weex HTML5 Renderer",
   "main": "dist/weex.common.js",
   "repository": {

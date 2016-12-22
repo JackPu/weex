@@ -7,22 +7,17 @@ import commonjs from 'rollup-plugin-commonjs'
 import buble from 'rollup-plugin-buble'
 
 const pkg = require('../package.json')
-const version = pkg.subversion.browser
+const version = pkg.subversion.lite
 const date = new Date().toISOString().split('T')[0].replace(/\-/g, '')
 const banner = `\
-(this.nativeLog || function(s) {console.log(s)})('START WEEX HTML5: ${version} Build ${date}');
-var global = this, process = { env: {}};
-!window._weex_performance && (window._weex_performance = {});
-window._weex_performance.START_INIT_WEEX = new Date().getTime() - performance.timing.navigationStart;
+console.log('START WEEX RENDER LITE: ${version} Build ${date}');
 `
 
 export default {
-  entry: './html5/render/browser/index.js',
-  dest: './dist/browser.js',
+  entry: './html5/render/lite/index.js',
+  dest: './dist/lite.common.js',
   banner,
-  format: 'umd',
-  moduleName: 'weex',
-  sourceMap: 'inline',
+  format: 'cjs',
   plugins: [
     postcss(),
     json(),
