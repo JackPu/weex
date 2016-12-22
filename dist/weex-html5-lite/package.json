@@ -1,0 +1,25 @@
+{
+  "name": "weex-html5-lite",
+  "version": "0.5.0",
+  "description": "A Smaller And Faster Weex HTML5 Renderer",
+  "main": "dist/weex.lite.common.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/alibaba/weex.git"
+  },
+  "keywords": [
+    "weex",
+    "html5",
+    "render",
+    "lite"
+  ],
+  "author": {
+    "name": "mr.raindrop"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://alibaba.github.io/weex",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/alibaba/weex/issues"
+  }
+}
