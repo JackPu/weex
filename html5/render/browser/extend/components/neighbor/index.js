@@ -268,7 +268,7 @@ const proto = {
           child = componentManager.createElement(data)
           child.node.classList.add('weex-neighbor-item')
           const width = this.data.style.width || this.node.getBoundingClientRect().width
-          const height = this.data.style.heigh || this.node.getBoundingClientRect().height
+          const height = this.data.style.height || this.node.getBoundingClientRect().height
           child.node.style.marginTop = -(height / 2) + 'px'
           child.node.style.marginLeft = -(width / 2) + 'px'
           this.slides.push(child)
@@ -307,7 +307,7 @@ const proto = {
       child = componentManager.createElement(data)
       child.node.classList.add('weex-neighbor-item')
       const width = this.data.style.width || this.node.getBoundingClientRect().width
-      const height = this.data.style.heigh || this.node.getBoundingClientRect().height
+      const height = this.data.style.height || this.node.getBoundingClientRect().height
       child.node.style.marginTop = -(height / 2) + 'px'
       child.node.style.marginLeft = -(width / 2) + 'px'
       this.slides.push(child)
@@ -352,7 +352,7 @@ const proto = {
 
     child.node.classList.add('weex-neighbor-item')
     const width = this.data.style.width || this.node.getBoundingClientRect().width
-    const height = this.data.style.heigh || this.node.getBoundingClientRect().height
+    const height = this.data.style.height || this.node.getBoundingClientRect().height
     child.node.style.marginTop = -(height / 2) + 'px'
     child.node.style.marginLeft = -(width / 2) + 'px'
     if (isAppend) {
