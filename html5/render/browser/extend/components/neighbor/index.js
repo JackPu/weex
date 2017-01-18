@@ -11,7 +11,7 @@ const DEFAULT_NEIGHBOR_SCALE = 0.8
 
 const TRANSITION_DURATION = 400
 
-const MAIN_SLIDE_SCALE = 0.9
+const DEFAULT_MAIN_SLIDE_SCALE = 0.9
 const MAIN_SLIDE_OPACITY = 1
 
 let extend, Component
@@ -206,7 +206,7 @@ function useGesture (slider) {
 }
 
 function moveSlides (slider, offset) {
-  const mainTransformStr = `translate(${offset}px, 0px) scale(${MAIN_SLIDE_SCALE})`
+  const mainTransformStr = `translate(${offset}px, 0px) scale(${slider.currentItemScale})`
   const mainNode = slider.mainSlide.node
   mainNode.style.webkitTransform = mainTransformStr
   mainNode.style.transform = mainTransformStr
@@ -267,8 +267,8 @@ const proto = {
         if (data.type !== 'indicator') {
           child = componentManager.createElement(data)
           child.node.classList.add('weex-neighbor-item')
-          const width = (data.style || {}).width || this.data.style.width
-          const height = (data.style || {}).height || this.data.style.height
+          const width = this.data.style.width || this.node.getBoundingClientRect().width
+          const height = this.data.style.heigh || this.node.getBoundingClientRect().height
           child.node.style.marginTop = -(height / 2) + 'px'
           child.node.style.marginLeft = -(width / 2) + 'px'
           this.slides.push(child)
@@ -306,8 +306,8 @@ const proto = {
     else {
       child = componentManager.createElement(data)
       child.node.classList.add('weex-neighbor-item')
-      const width = (data.style || {}).width || this.data.style.width
-      const height = (data.style || {}).height || this.data.style.height
+      const width = this.data.style.width || this.node.getBoundingClientRect().width
+      const height = this.data.style.heigh || this.node.getBoundingClientRect().height
       child.node.style.marginTop = -(height / 2) + 'px'
       child.node.style.marginLeft = -(width / 2) + 'px'
       this.slides.push(child)
@@ -351,9 +351,8 @@ const proto = {
     }
 
     child.node.classList.add('weex-neighbor-item')
-    const data = child.data
-    const width = (data.style || {}).width || this.data.style.width
-    const height = (data.style || {}).height || this.data.style.height
+    const width = this.data.style.width || this.node.getBoundingClientRect().width
+    const height = this.data.style.heigh || this.node.getBoundingClientRect().height
     child.node.style.marginTop = -(height / 2) + 'px'
     child.node.style.marginLeft = -(width / 2) + 'px'
     if (isAppend) {
@@ -435,7 +434,7 @@ const proto = {
     this.leftSlide = this.slides[loopIndex(index - 1, total)]
     this.rightSlide = this.slides[loopIndex(index + 1, total)]
 
-    const mainTransformStr = `translate(0px, 0px) scale(${MAIN_SLIDE_SCALE})`
+    const mainTransformStr = `translate(0px, 0px) scale(${this.currentItemScale})`
     setTimeout(() => animateTransform(this.mainSlide.node, {
       webkitTransform: mainTransformStr,
       transform: mainTransformStr,
@@ -581,6 +580,16 @@ const attr = {
     else {
       console.warn(`[h5-render] invalid value for 'neighbor-scale' of slider-neighbor: ${val}.`)
     }
+  },
+
+  currentItemScale (val) {
+    const cis = parseFloat(val)
+    if (!isNaN(cis) && cis >= 0 && cis <= 1) {
+      this.currentItemScale = cis
+    }
+    else {
+      console.warn(`[h5-render] invalid value for 'current-item-scale' of slider-neighbor: ${val}.`)
+    }
   }
 }
 
@@ -619,6 +628,7 @@ function init (Weex) {
     this.neighborSpace = DEFAULT_NEIGHBOR_SPACE
     this.neighborAlpha = DEFAULT_NEIGHBOR_ALPHA
     this.neighborScale = DEFAULT_NEIGHBOR_SCALE
+    this.currentItemScale = DEFAULT_MAIN_SLIDE_SCALE
 
     // bind event 'pageshow', 'pagehide' and 'visibilitychange' on window.
     idleWhenPageDisappear(this)
