@@ -1,41 +1,52 @@
-import { base } from '../mixins'
-import { validateStyles } from '../validator'
+import { extend } from '../utils'
 
-function getImgStyle (context) {
+/**
+ * get resize (stetch|cover|contain) related styles.
+ */
+function getResizeStyle (context) {
   const stretch = '100% 100%'
   const resize = context.resize || stretch
   const bgSize = ['cover', 'contain', stretch].indexOf(resize) > -1 ? resize : stretch
   return { 'background-size': bgSize }
 }
 
+function preProcessSrc (context, url, mergedStyle) {
+  if (!mergedStyle || !mergedStyle.width || !mergedStyle.height) {
+    return url
+  }
+  const { width, height } = mergedStyle
+  return context.processImgSrc && context.processImgSrc(url, {
+    width: parseFloat(width),
+    height: parseFloat(height),
+    quality: context.quality,
+    sharpen: context.sharpen,
+    original: context.original
+  }) || url
+}
+
 export default {
-  mixins: [base],
   props: {
-    src: {
-      type: String,
-      required: true
-    },
-    placeholder: {
-      type: String
-    },
-    resize: {
-      validator (value) {
-        /* istanbul ignore next */
-        return ['cover', 'contain', 'stretch'].indexOf(value) !== -1
-      }
-    }
+    src: String,
+    placeholder: String,
+    resize: String,
+    quality: String,
+    sharpen: String,
+    original: [String, Boolean]
   },
 
-  mounted: function () {
-    this.fireLazyload()
+  updated () {
+    this._fireLazyload()
+  },
+
+  mounted () {
+    this._fireLazyload()
   },
 
   render (createElement) {
-    this.prerender()
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     // let cssText = `background-image:url("${this.src}");`
 
@@ -43,17 +54,17 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
+    const ms = this._getComponentStyle(this.$vnode.data)
 
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': this.src,
-        'img-placeholder': this.placeholder
+        'img-src': preProcessSrc(this, this.src, ms),
+        'img-placeholder': preProcessSrc(this, this.placeholder, ms)
       },
-      on: this.createEventMap(['load', 'error']),
+      on: this._createEventMap(['load', 'error']),
       staticClass: 'weex-image',
-      staticStyle: getImgStyle(this)
-      // style: cssText
+      staticStyle: extend(ms, getResizeStyle(this))
     })
   }
 }

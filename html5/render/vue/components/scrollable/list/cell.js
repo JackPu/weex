@@ -1,18 +1,17 @@
-import { base } from '../../../mixins'
-import { validateStyles } from '../../../validator'
+// import { validateStyles } from '../../../validator'
 
 export default {
-  mixins: [base],
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('section', {
       attrs: { 'weex-type': 'cell' },
-      on: this.createEventMap(),
-      staticClass: 'weex-cell'
+      on: this._createEventMap(),
+      staticClass: 'weex-cell',
+      staticStyle: ms
     }, this.$slots.default)
   }
 }

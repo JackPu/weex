@@ -1,28 +1,34 @@
-const DEFAULT_VIEWPORT_WIDTH = process.env.VIEWPORT_WIDTH
+/**
+ * viewport priority:
+ *
+ * 1. meta viewport (developer custom)
+ * 2. setViewport(config) := config.width (private code) @deprecated
+ * 3. process.env.VIEWPORT_WIDTH (buid time)
+ *
+ */
+let viewportWidth = process.env.VIEWPORT_WIDTH
 
-function parseViewportWidth (config) {
-  let width = DEFAULT_VIEWPORT_WIDTH
-  if (config && config.width) {
-    width = Number(config.width) || config.width
-  }
-  return width
-}
+const wxViewportMeta = document.querySelector('meta[name="weex-viewport"]')
+const metaWidth = wxViewportMeta && parseInt(wxViewportMeta.getAttribute('content'))
+if (metaWidth && !isNaN(metaWidth) && metaWidth > 0) { viewportWidth = metaWidth }
 
 export function setViewport (config = {}) {
   const doc = window.document
 
   if (doc) {
-    const viewportWidth = parseViewportWidth(config)
+    // const viewportWidth = parseViewportWidth(config)
 
     // set root font-size
-    doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
+    // doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
 
     /**
      * why not to use window.screen.width to get screenWidth ? Because in some
      * old webkit browser on android system it get the device pixel width, which
      * is the screenWidth multiply by the device pixel ratio.
      */
-    const screenWidth = document.documentElement.getBoundingClientRect().width
+    const deRect = document.documentElement.getBoundingClientRect()
+    const screenWidth = deRect.width
+    const screenHeight = deRect.height
     const scale = screenWidth / viewportWidth
     const contents = [
       `width=${viewportWidth}`,
@@ -38,7 +44,12 @@ export function setViewport (config = {}) {
       meta.setAttribute('name', 'viewport')
       document.querySelector('head').appendChild(meta)
     }
-
     meta.setAttribute('content', contents.join(','))
+
+    return {
+      scale,
+      deviceWidth: screenWidth,
+      deviceHeight: screenHeight
+    }
   }
 }

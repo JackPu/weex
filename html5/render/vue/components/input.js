@@ -1,10 +1,10 @@
-import { base } from '../mixins'
-import { extend, mapFormEvents, setSelectionRange, getSelectionRange } from '../utils'
-import { validateStyles } from '../validator'
+import { extend, mapFormEvents } from '../utils'
+import { selectionRange } from '../mixins'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
+    mixins: [selectionRange],
     type: {
       type: String,
       default: 'text',
@@ -29,16 +29,12 @@ export default {
     },
     maxlength: [String, Number]
   },
-  methods: {
-    setSelectionRange,
-    getSelectionRange
-  },
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',
@@ -49,8 +45,9 @@ export default {
         placeholder: this.placeholder,
         maxlength: this.maxlength
       },
-      on: extend(this.createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-input'
+      on: extend(this._createEventMap(), mapFormEvents(this)),
+      staticClass: 'weex-input',
+      staticStyle: ms
     })
   }
 }

@@ -1,11 +1,10 @@
-import { base } from '../../mixins'
-import { validateStyles } from '../../validator'
+// import { validateStyles } from '../../validator'
 import { throttle, bind, extend } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
 
 export default {
-  mixins: [base, slideMixin],
+  mixins: [slideMixin],
   props: {
     'auto-play': {
       type: [String, Boolean],
@@ -58,14 +57,20 @@ export default {
           staticClass: 'weex-slider-cell'
         }, [vnode])
       })
-      this._indicator = createElement(indicator, {
-        staticClass: indicatorVnode.data.staticClass,
-        staticStyle: indicatorVnode.data.staticStyle,
-        attrs: {
-          count: cells.length,
-          active: this.currentIndex
-        }
-      })
+      if (indicatorVnode) {
+        indicatorVnode.data.attrs = indicatorVnode.data.attrs || {}
+        indicatorVnode.data.attrs.count = cells.length
+        indicatorVnode.data.attrs.active = this.currentIndex
+        // this._indicator = createElement(indicator, {
+        //   staticClass: indicatorVnode.data.staticClass,
+        //   staticStyle: indicatorVnode.data.staticStyle,
+        //   attrs: {
+        //     count: cells.length,
+        //     active: this.currentIndex
+        //   }
+        // })
+        this._indicator = createElement(indicator, indicatorVnode.data)
+      }
       return cells
     }
   },
@@ -108,11 +113,10 @@ export default {
   },
 
   render (createElement) {
-    this.prerender()
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     this._cells = this.formatChildren(createElement)
     this.frameCount = this._cells.length
@@ -123,7 +127,7 @@ export default {
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
         staticClass: 'weex-slider weex-slider-wrapper',
-        on: extend(this.createEventMap(), {
+        on: extend(this._createEventMap(['scroll', 'scrollstart', 'scrollend']), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd

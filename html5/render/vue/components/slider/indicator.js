@@ -1,5 +1,4 @@
-import { extend, extractKeys } from '../../utils'
-import { base } from '../../mixins'
+import { extend, extendKeys } from '../../utils'
 
 function getIndicatorItemStyle (spec, isActive) {
   const style = {}
@@ -10,10 +9,10 @@ function getIndicatorItemStyle (spec, isActive) {
 
 function _render (context, h) {
   const children = []
-  const { mergedStyle } = context.$vnode.data
+  const mergedStyle = context._getComponentStyle(context.$vnode.data)
   context.$vnode.data.cached = {}
-  extractKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
-  const indicatorSpecStyle = extractKeys(
+  extendKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
+  const indicatorSpecStyle = extendKeys(
       {},
       mergedStyle,
       ['item-color', 'item-selected-color', 'item-size']
@@ -32,7 +31,7 @@ function _render (context, h) {
   }
   if (!context.$vnode.context._isMounted) {
     context.$nextTick(function () {
-      _reLayout(this, _getVirtualRect(this), _getLtbr(this))
+      _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
     })
   }
   return h('nav', {
@@ -45,11 +44,10 @@ function _render (context, h) {
 /**
  * get indicator's virtual rect (width, height), which is the .
  */
-function _getVirtualRect (context) {
-  const mergedStyle = context.$vnode.data.mergedStyle
-  const ct = context.getParentRect()
+function _getVirtualRect (context, mergedStyle) {
+  const ct = context._getParentRect()
   const rect = ['width', 'height'].reduce((pre, key) => {
-    const msv = mergedStyle[key]
+    const msv = mergedStyle && mergedStyle[key]
     pre[key] = msv ? parseFloat(msv) : ct[key]
     return pre
   }, {})
@@ -59,10 +57,9 @@ function _getVirtualRect (context) {
 /**
  * get indicator's ltbr values (without units).
  */
-function _getLtbr (context) {
-  const mergedStyle = context.$vnode.data.mergedStyle
+function _getLtbr (context, mergedStyle) {
   return ['left', 'top', 'bottom', 'right'].reduce((pre, key) => {
-    const msv = mergedStyle[key]
+    const msv = mergedStyle && mergedStyle[key]
     // undefined, null, or '0px' -> o
     pre[key] = msv && parseFloat(msv) || 0
     return pre
@@ -111,7 +108,6 @@ function _reLayout (context, virtualRect, ltbr) {
 
 export default {
   name: 'indicator',
-  mixins: [base],
   methods: {
     show: function () {
       this.$el.style.visibility = 'visible'
@@ -125,15 +121,6 @@ export default {
     _reLayout(this, _getVirtualRect(this), _getLtbr(this))
   },
   render (createElement) {
-    // if (!this.$vnode.context._isMounted) {
-    //   // return createElement('nav')
-    //   return createElement('nav', {
-    //     attrs: { 'weex-type': 'indicator' },
-    //     staticClass: 'weex-indicator',
-    //     staticStyle: { display: 'none' }
-    //   }, [])
-    // }
-    this.prerender()
     return _render(this, createElement)
   }
 }

@@ -1,9 +1,9 @@
-import { base } from '../mixins'
-import { extend, mapFormEvents, setSelectionRange, getSelectionRange } from '../utils'
-import { validateStyles } from '../validator'
+import { extend, mapFormEvents } from '../utils'
+import { selectionRange } from '../mixins'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
+  mixins: [selectionRange],
   props: {
     value: String,
     placeholder: String,
@@ -20,16 +20,12 @@ export default {
       default: 2
     }
   },
-  methods: {
-    setSelectionRange,
-    getSelectionRange
-  },
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',
@@ -39,8 +35,9 @@ export default {
         placeholder: this.placeholder,
         rows: this.rows
       },
-      on: extend(this.createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-textarea'
+      on: extend(this._createEventMap(), mapFormEvents(this)),
+      staticClass: 'weex-textarea',
+      staticStyle: ms
     }, this.value)
   }
 }

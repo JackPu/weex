@@ -19,10 +19,16 @@ export function hasIntersection (rect, ctRect) {
  * @param  {HTMLElement}  container  optional, the container of this el.
  */
 export function isElementVisible (el, container) {
-  const ct = container || document.body
+  const ctRect = container && container.getBoundingClientRect()
+    || {
+      top: 0,
+      left: 0,
+      bottom: window.innerHeight,
+      right: window.innerWidth
+    }
   return hasIntersection(
     el.getBoundingClientRect(),
-    ct.getBoundingClientRect())
+    ctRect)
 }
 
 export function isComponentVisible (component) {
@@ -49,18 +55,18 @@ export function watchAppear (context) {
         context._visible = isComponentVisible(context)
         if (context._visible) {
           // TODO: create custom event object
-          on.appear && on.appear.fn({})
+          on.appear && on.appear({})
         }
         const handler = throttle(event => {
           const visible = isComponentVisible(context)
           if (visible !== context._visible) {
             context._visible = visible
             const listener = visible ? on.appear : on.disappear
-            if (listener && listener.fn) {
-              listener.fn(event)
+            if (listener) {
+              listener(event)
             }
           }
-        }, 100)
+        }, 10)
 
         // TODO: more reliable
         const scroller = getParentScroller(context)

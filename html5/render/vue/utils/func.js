@@ -1,10 +1,15 @@
 /**
  * Mix properties into target object.
+ * the rightest object's value has the highest priority.
  */
-export function extend (to, from) {
-  for (const key in from) {
-    to[key] = from[key]
-  }
+export function extend (to, ...args) {
+  if (!args || args.length <= 0) { return to }
+  args.forEach(from => {
+    if (typeof from !== 'object') { return }
+    for (const key in from) {
+      to[key] = from[key]
+    }
+  })
   return to
 }
 
@@ -12,6 +17,7 @@ export function extend (to, from) {
  * Mix specified properties into target object.
  */
 export function extendKeys (to, from, keys) {
+  if (!from) { return to }
   (keys || []).forEach(key => {
     to[key] = from[key]
   })
@@ -22,6 +28,7 @@ export function extendKeys (to, from, keys) {
  * Extract specified properties from src to target object.
  */
 export function extractKeys (to, from, keys) {
+  if (!from) { return to }
   (keys || []).forEach(key => {
     to[key] = from[key]
     delete from[key]
@@ -59,26 +66,23 @@ export function debounce (func, wait) {
   }
 }
 
-export function throttle (func, wait) {
+export function throttle (func, wait, callLastTime, tag) {
   let last = 0
+  let lastTimer = null
+  const lastTimeDuration = wait + (wait > 25 ? wait : 25)  // plus half wait time.
   return function (...args) {
     const context = this
     const time = new Date().getTime()
     if (time - last > wait) {
+      if (callLastTime) {
+        lastTimer && clearTimeout(lastTimer)
+        lastTimer = setTimeout(function () {
+          lastTimer = null
+          func.apply(context, args)
+        }, lastTimeDuration)
+      }
       func.apply(context, args)
       last = time
     }
   }
-}
-
-export function setSelectionRange(selectionStart, selectionEnd) {
-  this.$el.focus()
-  this.$el.setSelectionRange(selectionStart, selectionEnd)
-}
-
-export function getSelectionRange(callback) {
-  callback({
-    selectionStart: this.$el.selectionStart,
-    selectionEnd: this.$el.selectionEnd
-  }) 
 }

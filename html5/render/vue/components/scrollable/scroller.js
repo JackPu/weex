@@ -1,11 +1,11 @@
-import { base, scrollable } from '../../mixins'
-import { validateStyles } from '../../validator'
+import { scrollable } from '../../mixins'
+// import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
 import * as shared from './shared'
 import listMixin from './list/listMixin'
 
 export default {
-  mixins: [base, scrollable, listMixin],
+  mixins: [scrollable, listMixin],
   props: {
     scrollDirection: {
       type: [String],
@@ -70,20 +70,23 @@ export default {
     this.weexType = 'scroller'
 
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     this._cells = this.$slots.default || []
     this.$nextTick(() => {
       this.updateLayout()
     })
 
+    const ms = this._getComponentStyle(this.$vnode.data)
+
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      on: extend(this.createEventMap(), {
+      staticStyle: ms,
+      on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
